@@ -1,0 +1,109 @@
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class DuelsPlugin extends JavaPlugin {
+
+    private FileConfiguration config;
+
+    @Override
+    public void onEnable() {
+        getLogger().info("Duels plugin enabled");
+        config = getConfig();
+        config.options().copyDefaults(true);
+        saveConfig();
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("Duels plugin disabled");
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (command.getName().equalsIgnoreCase("duels")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Only players can execute this command.");
+                return true;
+            }
+            Player player = (Player) sender;
+            if (args.length < 1) {
+                player.sendMessage("Usage: /duels <createarena|list|setlobby|setspawn1|setspawn2>");
+                return true;
+            }
+            String subCommand = args[0];
+            switch (subCommand.toLowerCase()) {
+                case "createarena":
+                    if (!player.hasPermission("duels.createarena")) {
+                        player.sendMessage("You don't have permission to create an arena.");
+                        return true;
+                    }
+                    if (args.length < 2) {
+                        player.sendMessage("Usage: /duels createarena <id>");
+                        return true;
+                    }
+                    String arenaId = args[1];
+                    if (!isValidArenaId(arenaId)) {
+                        player.sendMessage("The id must consist of 4 numbers.");
+                        return true;
+                    }
+                    // Implement arena creation logic here
+                    player.sendMessage("Arena created with id: " + arenaId);
+                    return true;
+                case "list":
+                    if (!player.hasPermission("duels.list")) {
+                        player.sendMessage("You don't have permission to list arenas.");
+                        return true;
+                    }
+                    // Implement listing logic here
+                    player.sendMessage("List of arenas:");
+                    // List arenas from config or database
+                    return true;
+                case "setlobby":
+                    if (!player.hasPermission("duels.setlobby")) {
+                        player.sendMessage("You don't have permission to set the lobby.");
+                        return true;
+                    }
+                    // Implement set lobby logic here
+                    player.sendMessage("Lobby location set.");
+                    return true;
+                case "setspawn1":
+                    if (!player.hasPermission("duels.setspawn1")) {
+                        player.sendMessage("You don't have permission to set spawn locations.");
+                        return true;
+                    }
+                    if (args.length < 2) {
+                        player.sendMessage("Usage: /duels setspawn1 <id>");
+                        return true;
+                    }
+                    String spawn1Id = args[1];
+                    // Implement set spawn 1 logic here
+                    player.sendMessage("Spawn location 1 set for arena id: " + spawn1Id);
+                    return true;
+                case "setspawn2":
+                    if (!player.hasPermission("duels.setspawn2")) {
+                        player.sendMessage("You don't have permission to set spawn locations.");
+                        return true;
+                    }
+                    if (args.length < 2) {
+                        player.sendMessage("Usage: /duels setspawn2 <id>");
+                        return true;
+                    }
+                    String spawn2Id = args[1];
+                    // Implement set spawn 2 logic here
+                    player.sendMessage("Spawn location 2 set for arena id: " + spawn2Id);
+                    return true;
+                default:
+                    player.sendMessage("Unknown subcommand. Usage: /duels <createarena|list|setlobby|setspawn1|setspawn2>");
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isValidArenaId(String id) {
+        return id.matches("\\d{4}");
+    }
+}
